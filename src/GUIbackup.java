@@ -1,3 +1,4 @@
+/*
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.BorderFactory.*;
@@ -94,25 +95,18 @@ public class GUI {
         btn_start.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent ev){
-                SwingWorker<Void,String> worker = new SwingWorker<Void,String>(){
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        File puzzleFile = new File(textfield.getText());
-                        if(puzzleFile.exists()){
-                            CardLayout cl = (CardLayout) pnl_info.getLayout();
-                            cl.next(pnl_info);
-                            pnl_puzzle.generatePuzzle(textfield.getText());
-                            pnl_puzzle.animateSolution(lbl_process);
-                            cl.first(pnl_info);
-                        }else{
-                            JOptionPane.showMessageDialog(frame, "File not found!");
-                        }
-                        return null;
-                    }
-                };
-                worker.execute();
+                File puzzleFile = new File(textfield.getText());
+                if(puzzleFile.exists()){
+                    CardLayout cl = (CardLayout) pnl_info.getLayout();
+                    cl.next(pnl_info);
+                    pnl_puzzle.generatePuzzle(textfield.getText());
+                    pnl_puzzle.repaint();
+                    pnl_puzzle.animateSolution();
+                    cl.first(pnl_info);
+                }else{
+                    JOptionPane.showMessageDialog(frame, "File not found!");
+                }
             }
-            
         });
 
         frame.add(pnl_north, BorderLayout.NORTH);
@@ -177,7 +171,7 @@ class PuzzlePanel extends JPanel{
             pnl_puzzleCard[i-1].setLayout(new CardLayout());
             CardLayout cl = (CardLayout)(pnl_puzzleCard[i-1].getLayout());
             for(int j=1; j<=16; j++){
-                pnl_puzzleCard[i-1].add("" + j, new PuzzleElement(j));
+                pnl_puzzleCard[i-1].add("" + j, new PuzzleElement(i));
             }
             this.add(pnl_puzzleCard[i-1],c);
             cl.show(pnl_puzzleCard[i-1], "" + i);
@@ -233,19 +227,20 @@ class PuzzlePanel extends JPanel{
         for(int i=0; i<4; i++){
             for(int j=0; j<4; j++){
                 CardLayout cl = (CardLayout)(pnl_puzzleCard[4*i+j].getLayout());
-                cl.show(pnl_puzzleCard[4*i+j], "" + pieces[i][j] );
+                cl.show(pnl_puzzleCard[4*i+j], "" + (4*i+j) );
             }
         }
+        this.revalidate();
+        this.repaint();
     }
     
     
-    public void animateSolution(JLabel lbl_move){
+    public void animateSolution(){
         puzzleTree.start();
         List<Move> solutions = puzzleTree.getSolution();
         for(Move m : solutions){
             System.out.println(m);
             animateMove(m);
-            lbl_move.setText(m.toString());
             try{
                 Thread.sleep(1000);
             }catch(InterruptedException ex){
@@ -268,10 +263,22 @@ class PuzzlePanel extends JPanel{
         pieces[y1][x1] = pieces[y2][x2];
         pieces[y2][x2] = temp;
 
-        CardLayout cl1 = (CardLayout)(pnl_puzzleCard[y1*4+x1].getLayout());
-        cl1.show(pnl_puzzleCard[y1*4+x1],"" + pieces[y1][x1]);
-        CardLayout cl2 = (CardLayout)(pnl_puzzleCard[y2*4+x2].getLayout());
-        cl2.show(pnl_puzzleCard[y2*4+x2],"" + pieces[y2][x2]);
+        System.out.println(this.getComponentCount());
+        this.removeAll();
+        for(int i=0; i<4; i++){
+            for(int j=0; j<4; j++){
+                GridBagConstraints c = new GridBagConstraints();
+                
+                c.gridx = j;
+                c.gridy = i;
+                c.weightx = 0;
+                c.weighty = 1;
+                
+                this.add(new PuzzleElement(pieces[i][j]), c);
+            }
+        }
+        this.repaint();
+        this.revalidate();
     }
     public void animateMove(Move m){
         int void_idx = getVoidIdx();
@@ -284,11 +291,12 @@ class PuzzlePanel extends JPanel{
         }else if(m == Move.RIGHT){
             swapLabel(voidx, voidy, voidx+1, voidy);
         }else if(m == Move.LEFT){
-            swapLabel(voidx, voidy, voidx-1, voidy);
+            swapLabel(voidx, voidy, voidx-1, voidy+1);
         }
         
     }
-}/*
-class PuzzleWorker extends SwingWorker<> {
+}
+class GUIbackup {
     
-}*/
+}
+*/
