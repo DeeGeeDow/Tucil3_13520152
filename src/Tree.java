@@ -8,15 +8,18 @@ public class Tree {
     private PriorityQueue<Node> pq;
     private List<Move> solution;
     private int costUpperBound;
+    private int numOfNodesGenerated;
     private long start;
     private long end;
 
     public Tree(Node root){
         this.root = root;
         this.isPossible = this.root.possibleChecker();
+        System.out.println("this is run");
         this.pq = new PriorityQueue<Node>(new NodeComparator());
         this.costUpperBound = Integer.MAX_VALUE;
         this.solution = new ArrayList<Move>();
+        this.numOfNodesGenerated = 1;
     }
 
     public void start(){
@@ -44,6 +47,7 @@ public class Tree {
                         nodeCheck.expand();
                         for(Node c : nodeCheck.getChildren() ){
                             pq.add(c);
+                            numOfNodesGenerated++;
                         }
                         nodeCheck.setIsActive(false);                       
                     }
@@ -59,6 +63,13 @@ public class Tree {
             Collections.reverse(solution);
         }
         end = System.currentTimeMillis();
+    }
+
+    public int getNumOfNodesGenerated(){
+        return this.numOfNodesGenerated;
+    }
+    public Node getRoot(){
+        return this.root;
     }
 
     public List<Move> getSolution(){

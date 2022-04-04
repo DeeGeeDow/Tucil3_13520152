@@ -95,8 +95,10 @@ public class GUI {
         pnl_south.setPreferredSize(southDimension);
 
         JTextArea txtarea_solution = new JTextArea();
-        txtarea_solution.setBounds(20, 20, 20, 20);
-        txtarea_solution.setPreferredSize(southDimension);
+        //txtarea_solution.setBounds(20, 20, 20, 20);
+        //DefaultCaret caret = (DefaultCaret)txtarea_solution.getCaret();
+        //caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        //txtarea_solution.setPreferredSize(southDimension);
         JScrollPane scrollpane = new JScrollPane(txtarea_solution);
         scrollpane.setPreferredSize(southDimension);
         pnl_south.add(scrollpane);
@@ -111,6 +113,7 @@ public class GUI {
                     protected Void doInBackground() throws Exception {
                         File puzzleFile = new File(textfield.getText());
                         if(puzzleFile.exists()){
+                            txtarea_solution.setText("");
                             CardLayout cl = (CardLayout) pnl_info.getLayout();
                             cl.next(pnl_info);
                             pnl_puzzle.generatePuzzle(textfield.getText());
@@ -302,12 +305,43 @@ class PuzzlePanel extends JPanel{
         }
     }
     public String generateSolutionText(){
-        String text = "Solution :\n";
-        for(Move m : puzzleTree.getSolution()){
-            text += m.toString() + '\n';
+        Node root = puzzleTree.getRoot();
+        String text = "1. Initial Puzzle Matrix: \n";
+        for(int i=0; i<4; i++){
+            for(int j=0; j<4; j++){
+                text += root.getCell(i, j) + " ";
+            }
+            text += '\n';
         }
-        text += "Steps : " + puzzleTree.getSolution().size();
-        text += "\nTime elapsed to generate solution: " + puzzleTree.getTimeElapsed() + " ms\n";
+        System.out.println("1 success");
+        text += "2. Kurang(i) values: \n";
+        for(int i=1; i<=16; i++){
+            text += "Kurang(" + i + ") = " + root.Kurang(i) + "\n";
+        }
+        System.out.println("2 success");
+        text += "3. Sum of Kurang(i) + X = " + root.kurangPlusX() + "\n";
+        System.out.println("3 success");
+        if(root.possibleChecker()){
+            text += "Solution Steps: \n";
+            Node x = root;
+            for(Move m : puzzleTree.getSolution()){
+                text += m.toString() + '\n';
+                x.move(m);
+                for(int i=0; i<4; i++){
+                    for(int j=0; j<4; j++){
+                        text += x.getCell(i, j) + " ";
+                    }
+                    text += '\n';
+                }
+            }
+            System.out.println("4 success");
+            text += "Steps : " + puzzleTree.getSolution().size();
+            text += "\nTime elapsed to generate solution: " + puzzleTree.getTimeElapsed() + " ms\n";
+            text += "Number of generated nodes = " + puzzleTree.getNumOfNodesGenerated() + "\n";
+            System.out.println("all success");
+        }else{
+            text += "Puzzle cannot be solved";
+        }
         return text;
     }
 }

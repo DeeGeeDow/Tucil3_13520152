@@ -1,5 +1,4 @@
 import java.util.*;
-import java.lang.Math;
 
 public class Node {
     private List<Node> child;
@@ -18,7 +17,8 @@ public class Node {
         this.move = Move.NULL;
         this.n = 4;
         this.depth = 0;
-        this.puzzle = puzzle;
+        this.puzzle = new int[n][n];
+        for(int i=0; i<n; i++) System.arraycopy(puzzle[i], 0, this.puzzle[i], 0, n);
         this.cost = this.costCounter();
         this.parent = null;
         this.isActive = false;
@@ -56,24 +56,44 @@ public class Node {
         return this.cost;
     }
 
+    public int[][] getPuzzle(){
+        return this.puzzle;
+    }
+    public int getDepth(){
+        return this.depth;
+    }
+
     public List<Node> getChildren(){
         return this.child;
     }
-
-    public boolean possibleChecker(){
+    public int Kurang(int i){
+        int idx = 0;
+        int res = 0;
+        while(puzzle[idx/n][idx%n] != i){
+            idx++;
+        }
+        while(idx<n*n){
+            if(puzzle[idx/n][idx%n] < i) {res++;}
+            idx++;
+        }
+        //System.out.println("Kurang " + i + " = " + res);
+        return res;
+    }
+    public int kurangPlusX(){
         int c = 0;
         for(int i=0; i<n*n; i++){
             if(this.puzzle[i/n][i%n] == this.n*this.n && (i/n + i%n)%2 == 1){
                 c++;
-            }
-            for(int j=i+1; j<n*n; j++){
-                if(this.puzzle[i/n][i%n] > this.puzzle[j/n][j%n]){
-                    c++;
-                }
+                break;
             }
         }
-
-        return c%2 == 0;
+        for(int i=1; i<=n*n; i++){
+            c+=Kurang(i);
+        }
+        return c;
+    }
+    public boolean possibleChecker(){
+        return kurangPlusX()%2 == 0;
     }
 
     public boolean getIsActive(){
@@ -103,8 +123,7 @@ public class Node {
         int c = this.depth;
         for(int i=0; i<this.n*this.n; i++){
             if(this.puzzle[i/this.n][i%this.n] != this.n*this.n && i+1 != this.puzzle[i/this.n][i%this.n]){
-                int num = this.puzzle[i/this.n][i%this.n];
-                c += Math.abs(num/n-i/n) + Math.abs(num%n - i%n);
+                c++;
             }
         }
         return c;
@@ -132,7 +151,7 @@ public class Node {
         }else return false;
     }
     
-    private void move(Move move){        
+    public void move(Move move){        
         int voidX = getVoidIndex()/n;
         int voidY = getVoidIndex()%n;
         if(move == Move.UP){
@@ -159,16 +178,23 @@ public class Node {
         this.cost = this.costCounter();
     }
 
+    private Move oppositeMove(Move m){
+        if(m == Move.DOWN) return Move.UP;
+        if(m == Move.LEFT) return Move.RIGHT;
+        if(m == Move.RIGHT) return Move.LEFT;
+        if(m == Move.UP) return Move.DOWN;
+        return Move.NULL;
+    }
     private void generateChild(){
         Move[] moveset = Move.values();
         for(Move m : moveset){
-            if(isValidMove(m)){
+            if(isValidMove(m) && this.move != oppositeMove(m)){
                 Node nd = new Node(m, this.n, this.depth+1, this.puzzle, this);
                 this.child.add(nd);
             }
         }
     }
-
+    
     public void expand(){
         System.out.println("Expanding Node...");
         if(this.isActive){
