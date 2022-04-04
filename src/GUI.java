@@ -30,7 +30,7 @@ public class GUI {
         frame.setResizable(false);
         frame.setSize(420,560);
         
-        ImageIcon logo = new ImageIcon("src/logo.png");
+        ImageIcon logo = new ImageIcon("src/assets/logo.png");
         frame.setIconImage(logo.getImage());
         frame.getContentPane().setBackground(new Color(0x9c6b65));
         
@@ -116,6 +116,7 @@ public class GUI {
                             txtarea_solution.setText("");
                             CardLayout cl = (CardLayout) pnl_info.getLayout();
                             cl.next(pnl_info);
+                            lbl_process.setText("Processing...");
                             pnl_puzzle.generatePuzzle(textfield.getText());
                             pnl_puzzle.animateSolution(lbl_process);
                             cl.first(pnl_info);

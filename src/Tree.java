@@ -72,6 +72,10 @@ public class Tree {
         return this.root;
     }
 
+    public boolean getIsPossible(){
+        return this.isPossible;
+    }
+    
     public List<Move> getSolution(){
         return this.solution;
     } 
