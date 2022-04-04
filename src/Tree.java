@@ -8,6 +8,8 @@ public class Tree {
     private PriorityQueue<Node> pq;
     private List<Move> solution;
     private int costUpperBound;
+    private long start;
+    private long end;
 
     public Tree(Node root){
         this.root = root;
@@ -18,6 +20,7 @@ public class Tree {
     }
 
     public void start(){
+        start = System.currentTimeMillis();
         if(isPossible){
             System.out.println("Generating Tree..");
             Node bestLastNode = null;
@@ -55,12 +58,16 @@ public class Tree {
             }
             Collections.reverse(solution);
         }
+        end = System.currentTimeMillis();
     }
 
     public List<Move> getSolution(){
         return this.solution;
     } 
 
+    public long getTimeElapsed(){
+        return this.end - this.start;
+    }
     public static void main(String[] args){
         int[][] intarray = new int[4][4];
         try{
@@ -106,6 +113,23 @@ public class Tree {
         }catch(IOException e){
             System.out.println("An error occurred.");
             e.printStackTrace();
+        }
+    }
+
+    public void SaveFile(String filepath, String text){
+
+        try{
+            File myObj = new File(filepath);
+            if (myObj.createNewFile()) {
+              System.out.println("File created: " + myObj.getName());
+            } else {
+              System.out.println("File already exists.");
+            }
+            PrintWriter out = new PrintWriter(filepath);
+            out.println(text);
+            out.close();
+        }catch(IOException e){
+            System.out.println("Error has occured");
         }
     }
 }

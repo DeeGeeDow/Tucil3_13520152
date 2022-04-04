@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.awt.Image;
 import java.awt.Font;
-
+import java.awt.Dimension;
 import java.io.*;
 
 import java.util.*;
@@ -89,6 +89,18 @@ public class GUI {
         JPanel pnl_center = new JPanel();
         pnl_center.setOpaque(false);
         
+        Dimension southDimension = new Dimension(400,100);
+        JPanel pnl_south = new JPanel();
+        pnl_south.setOpaque(false);
+        pnl_south.setPreferredSize(southDimension);
+
+        JTextArea txtarea_solution = new JTextArea();
+        txtarea_solution.setBounds(20, 20, 20, 20);
+        txtarea_solution.setPreferredSize(southDimension);
+        JScrollPane scrollpane = new JScrollPane(txtarea_solution);
+        scrollpane.setPreferredSize(southDimension);
+        pnl_south.add(scrollpane);
+
         pnl_puzzle = new PuzzlePanel();
         pnl_center.add(pnl_puzzle);
         btn_start.addActionListener(new ActionListener(){
@@ -104,6 +116,7 @@ public class GUI {
                             pnl_puzzle.generatePuzzle(textfield.getText());
                             pnl_puzzle.animateSolution(lbl_process);
                             cl.first(pnl_info);
+                            txtarea_solution.setText(pnl_puzzle.generateSolutionText());
                         }else{
                             JOptionPane.showMessageDialog(frame, "File not found!");
                         }
@@ -117,6 +130,7 @@ public class GUI {
 
         frame.add(pnl_north, BorderLayout.NORTH);
         frame.add(pnl_center, BorderLayout.CENTER);
+        frame.add(pnl_south, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
     public static void main(String[] args){
@@ -286,9 +300,19 @@ class PuzzlePanel extends JPanel{
         }else if(m == Move.LEFT){
             swapLabel(voidx, voidy, voidx-1, voidy);
         }
-        
     }
-}/*
+    public String generateSolutionText(){
+        String text = "Solution :\n";
+        for(Move m : puzzleTree.getSolution()){
+            text += m.toString() + '\n';
+        }
+        text += "Steps : " + puzzleTree.getSolution().size();
+        text += "\nTime elapsed to generate solution: " + puzzleTree.getTimeElapsed() + " ms\n";
+        return text;
+    }
+}
+
+/*
 class PuzzleWorker extends SwingWorker<> {
     
 }*/
